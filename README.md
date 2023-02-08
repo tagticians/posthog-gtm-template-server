@@ -67,6 +67,7 @@ posthog.init({{CONST - Posthog Project API Key}}, {
 ```
 
    > ⚠️ Remember to use the correct `api_host` address linked to your account.
+
    > ⚠️ If you also want to **disable the autocapture feature** make sure to add `autocapture:false` to the post.init options object.
 
 6. Add an All Pages trigger (or any other applicable trigger) to the Custom HTML tag, then Save.
