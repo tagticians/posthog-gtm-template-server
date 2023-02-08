@@ -41,16 +41,16 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "SELECT",
     "name": "posthogEndPointSelection",
-    "displayName": "Select your version of Posthog",
+    "displayName": "Select your version of PostHog",
     "macrosInSelect": false,
     "selectItems": [
       {
         "value": "cloud",
-        "displayValue": "Posthog Cloud"
+        "displayValue": "PostHog Cloud"
       },
       {
         "value": "custom",
-        "displayValue": "Posthog Self-Host"
+        "displayValue": "PostHog Self-Host"
       }
     ],
     "simpleValueType": true
@@ -58,7 +58,7 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "SELECT",
     "name": "posthogCloudAccountURL",
-    "displayName": "Select the hostname of your Posthog account",
+    "displayName": "Select the hostname of your PostHog account",
     "macrosInSelect": false,
     "selectItems": [
       {
@@ -93,6 +93,30 @@ ___TEMPLATE_PARAMETERS___
       }
     ],
     "help": "Learn more about \u003ca href\u003d\"https://posthog.com/docs/self-host\"\u003eself-hosting Posthog\u003c/a\u003e"
+  },
+  {
+    "type": "SELECT",
+    "name": "posthogSelectDistinctIdSource",
+    "displayName": "Select source of Distinct ID value",
+    "selectItems": [
+      {
+        "value": "posthogCookieDistinctId",
+        "displayValue": "PostHog Distinct ID cookie value"
+      },
+      {
+        "value": "posthogCookieDeviceId",
+        "displayValue": "PostHog Device ID cookie value"
+      },
+      {
+        "value": "ga4ClientId",
+        "displayValue": "GA4 Client ID"
+      }
+    ],
+    "simpleValueType": true,
+    "help": "The Distinct ID is required to send data server-side. However, once the data is set, \u003cstrong\u003eit can no longer be overwritten\u003c/strong\u003e. The selection can have a major impact on your analysis capabilities. \u003cstrong\u003eIf in doubt, please switch to a Web set up\u003c/strong\u003e which allows you to omit the Distinct ID when unkown.\u003c/ br\u003eSince this template is dependent on the GA4 client-side tag and server-side client \u003cstrong\u003ethe default Distinct ID value will be set to GA4\u0027s Client ID value\u003c/strong\u003e.",
+    "notSetText": "- Select a source -",
+    "alwaysInSummary": true,
+    "defaultValue": "ga4ClientId"
   },
   {
     "type": "SELECT",
@@ -223,12 +247,22 @@ if(event_type === "pageView") {
 
 const posthogCookies = getEventData("posthog_cookies") || "";
 const posthogCookiesObject = JSON.parse(posthogCookies);
+let distinct_id_source = data.posthogSelectDistinctIdSource;
+let distinct_id;
+
+if (distinct_id_source === "posthogCookieDistinctId" && !!posthogCookiesObject.distinct_id) {
+  distinct_id = posthogCookiesObject.distinct_id;
+} else if (distinct_id_source === "posthogCookieDeviceId" && !!posthogCookiesObject["$device_id"]) {
+  distinct_id = posthogCookiesObject["$device_id"];
+} else {
+  distinct_id = getEventData("client_id");
+}
 
 // Build Root API Object
 let postBody = {
     "api_key": projectApiKey,
     "event": event_name,
-    "distinct_id": posthogCookiesObject.distinct_id || posthogCookiesObject["$device_id"] || getEventData("client_id")
+    "distinct_id": distinct_id
 };
 
 // Build Event Parameters Object
@@ -350,6 +384,6 @@ scenarios: []
 
 ___NOTES___
 
-Created on 08/02/2023, 16:13:11
+Created on 08/02/2023, 16:30:02
 
 
