@@ -60,12 +60,14 @@ Learn more about [available configuration options](https://posthog.com/docs/inte
 }(document, window.posthog || []);
 posthog.init({{CONST - Posthog Project API Key}}, {
     api_host: 'https://eu.posthog.com',
-    capture_pageview: false
+    capture_pageview: false,
+    capture_pageleave: false
 })
 </script>
 ```
 
    > ⚠️ Remember to use the correct `api_host` address linked to your account.
+   > ⚠️ If you also want to **disable the autocapture feature** make sure to add `autocapture:false` to the post.init options object.
 
 6. Add an All Pages trigger (or any other applicable trigger) to the Custom HTML tag, then Save.
 7. In GTM, create a Cookie variable to grab PostHog cookies. The cookie that is set by PostHog, and that contains valuable information, has a name that looks like this: `ph_<api_key>_posthog`.
