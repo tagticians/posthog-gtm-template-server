@@ -298,8 +298,16 @@ let eventProperties = {
   "$useragent": getEventData("user_agent") || "",
   "$ip": getEventData("ip_override") || "",
   "language": getEventData("language") || "",
-  "$lib": "api"
+  "$lib": "api",
+  "$active_feature_flags": posthogCookiesObject["$active_feature_flags"]
 };
+
+// Add info about enabled feature flags
+posthogCookiesObject["$active_feature_flags"].forEach(flag => {
+  const featureKey = "$feature/"+flag;
+  const featureValue = posthogCookiesObject["$enabled_feature_flags"][flag];
+  eventProperties[featureKey] = featureValue;
+});
 
 // Merge Event and Other Parameters Objects
 const mergeObj = (fromObj, toObj) => {
